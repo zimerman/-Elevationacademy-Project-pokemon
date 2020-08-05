@@ -29,7 +29,14 @@ for pokemon in pokemon_data:
     except IntegrityError as error:
         code, message = error.args
         print("pokemon already exist")
-
+    query = "INSERT into type values ('{}')".format(pokemon.get("type"))
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(query)
+            connection.commit()
+    except IntegrityError as error:
+        code, message = error.args
+        print("type already exist")
     for ownedBy in pokemon["ownedBy"]:
         query = "INSERT into trainers(name,town) values ('{}','{}')".format(
             ownedBy.get("name"),
@@ -42,9 +49,9 @@ for pokemon in pokemon_data:
         except IntegrityError as error:
             code, message = error.args
             print("trainer already exist")
-
-        query = "INSERT into ownedby values ({},'{}')".format(
+        query = "INSERT into ownedby values ({},'{}','{}')".format(
             pokemon.get("id"),
+            pokemon.get("name"),
             ownedBy.get("name")
         )
         try:
@@ -54,7 +61,6 @@ for pokemon in pokemon_data:
         except IntegrityError as error:
             code, message = error.args
             print("ownedBy already exist")
-
     query = "INSERT into pokemontype values ({},'{}')".format(
         pokemon.get("id"),
         pokemon.get("type")
