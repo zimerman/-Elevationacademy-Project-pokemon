@@ -1,5 +1,4 @@
-from flask import Flask, Response, request
-import pymysql
+from flask import Flask, request
 import json
 import requests
 from pymysql import IntegrityError
@@ -7,9 +6,15 @@ import pokemon_data
 import trainer_data
 import type_data
 import pokemonApi
-from conect import connection
+import food_data
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='', static_folder='picture')
+
+
+@app.route('/')
+def root():
+    file_path = 'pi.png'
+    return app.send_static_file(file_path)
 
 
 @app.route('/pokemons_pokemon/<name_pokemon>')
@@ -63,8 +68,8 @@ def delete_pokemon_and_trainer():
 @app.route('/add_pokemon', methods=["POST"])
 def add_pokemon():
     pokemon_to_add = request.get_json()
-    mandatory_fields = ["id", "name", "height", "weight"]
-    missing_params = [fields for fields in mandatory_fields if not pokemon_to_add.get(fields)]
+    mandatory_params = ["id", "name", "height", "weight"]
+    missing_params = [fields for fields in mandatory_params if not pokemon_to_add.get(fields)]
     if missing_params:
         return {"Error": f"fields {missing_params} are missing"}, 400
     list_types = pokemon_to_add.get("type")
@@ -77,24 +82,18 @@ def add_pokemon():
         return json.dumps({"ERROR": str(e)}), 500
     try:
         type_data.add_to_type(list_types)
-    except IntegrityError as error:
-        pass
     except Exception as e:
         return json.dumps({"ERROR": str(e)}), 500
     try:
         type_data.add_to_pokemontype_list(pokemon_to_add.get("id"), list_types)
         return {"Status": "Succes, Added pokemon"}, 201
-    except IntegrityError as error:
-        code, message = error.args
-        return {"Error": "This pair already exist"}, 409
     except Exception as e:
         return json.dumps({"ERROR": str(e)}), 500
 
 
 @app.route('/update_type/<name_pokemon>', methods=["PUT"])
 def update_type(name_pokemon):
-    pokemon_url = 'https://pokeapi.co/api/v2/pokemon/{}'.format(name_pokemon)
-    pokemon = requests.get(url=pokemon_url, verify=False)
+    pokemon = pokemonApi.find_pokemon(name_pokemon)
     try:
         list_type = type_data.get_types(name_pokemon)
         if not list_type:
@@ -160,6 +159,39 @@ def evolve():
         return {"Error": "This pair pokemon & trainer not found"}, 404
     except Exception as e:
         return json.dumps({"ERROR": str(e)}), 500
+
+
+@app.route('/feed', methods=["DELETE"])
+def feed_pokemon():
+    pokemon_to_feed = request.get_json()
+    try:
+        result = trainer_data.get_id_by_pokemon_and_trainer(pokemon_to_feed.get("pokemon"), pokemon_to_feed.get("trainer"))
+    except Exception as e:
+        return json.dumps({"ERROR": str(e)}), 500
+    if not result:
+        return {"Error": "This pair pokemon & trainer not exit"}, 404
+    list_types = type_data.get_types_feed(pokemon_to_feed.get("pokemon"))
+    print(list_types)
+    if not isinstance(list_types, list):
+        list_types = [list_types]
+    list_sensitive_food = food_data.get_sensitive_food(list_types)
+    list_sensitive_food = [food['name_food'] for food in list_sensitive_food[0]]
+    print(list_sensitive_food)
+    if pokemon_to_feed.get("food") in list_sensitive_food:
+        try:
+            print(pokemon_to_feed.get("pokemon"), pokemon_to_feed.get("trainer"))
+            trainer_data.delete_pokemon_and_trainer_data_food(pokemon_to_feed.get("pokemon"),
+                                                         pokemon_to_feed.get("trainer"))
+            return {"Status": 'Oops Pokemon {} is dead you have fed {} and it is {} sensitive'.format(
+                pokemon_to_feed.get("pokemon"),
+                pokemon_to_feed.get("food"),
+                pokemon_to_feed.get("food"))}, 201
+        except Exception as error:
+            code, message = error.args
+            return {"Error": "This pokemon and trainer not exist"}, 409
+    else:
+        return {"Status": 'Bravo you fed your Pokemon {} and now he is full'.format(
+            pokemon_to_feed.get("pokemon"))}, 201
 
 
 port_number = 3000
