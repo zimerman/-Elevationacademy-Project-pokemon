@@ -1,20 +1,12 @@
-import pymysql
 import json
 from pymysql import IntegrityError
-connection = pymysql.connect(
-    host="localhost",
-    user="admin",
-    password="",
-    db="sql_pokemon",
-    charset="utf8",
-    cursorclass=pymysql.cursors.DictCursor
-)
-
-if connection.open:
-    print("the connection is opened")
+from conect import connection
 
 pokemon_file = open('pokemon_data.json', 'r')
 pokemon_data = json.load(pokemon_file)
+
+sensitive_food_file = open('food_data.json', 'r')
+sensitive_food_data = json.load(sensitive_food_file)
 for pokemon in pokemon_data:
     query = "INSERT into pokemon values ({},'{}',{},{})".format(
         pokemon.get("id"),
@@ -72,5 +64,37 @@ for pokemon in pokemon_data:
     except IntegrityError as error:
         code, message = error.args
         print("type already exist")
+for sensitive in sensitive_food_data:
+    for food in sensitive.get("food"):
+        query = "INSERT into food values ('{}')".format(food)
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(query)
+                connection.commit()
+        except IntegrityError as error:
+            code, message = error.args
+            print("type already exist")
+        query = "INSERT into sensitive_food values ('{}','{}')".format(
+            food,
+            sensitive.get("type")
+        )
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(query)
+                connection.commit()
+        except IntegrityError as error:
+            code, message = error.args
+            print("type already exist")
+
+# for type in ["flying", "dark", "steel"]:
+#     query = "INSERT into type values ('{}')".format(type)
+#     try:
+#         with connection.cursor() as cursor:
+#             cursor.execute(query)
+#             connection.commit()
+#     except IntegrityError as error:
+#         code, message = error.args
+#         print("type already exist")
+
 
 pokemon_file.close()
