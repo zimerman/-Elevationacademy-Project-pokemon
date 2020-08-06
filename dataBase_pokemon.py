@@ -85,16 +85,15 @@ for sensitive in sensitive_food_data:
         except IntegrityError as error:
             code, message = error.args
             print("type already exist")
-
-# for type in ["flying", "dark", "steel"]:
-#     query = "INSERT into type values ('{}')".format(type)
-#     try:
-#         with connection.cursor() as cursor:
-#             cursor.execute(query)
-#             connection.commit()
-#     except IntegrityError as error:
-#         code, message = error.args
-#         print("type already exist")
+for type in ["flying", "dark", "steel"]:
+    query = "INSERT into type values ('{}')".format(type)
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(query)
+            connection.commit()
+    except IntegrityError as error:
+        code, message = error.args
+        print("type already exist")
 
 
 pokemon_file.close()
