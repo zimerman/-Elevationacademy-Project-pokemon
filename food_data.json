@@ -1,0 +1,74 @@
+[
+  {
+    "type" : "bug",
+    "food": ["carrot","bread"]
+  },
+  {
+    "type" : "dragon",
+    "food": ["cheese"]
+  },
+  {
+    "type" : "electric",
+    "food": ["candy", "apple","meet"]
+  },
+  {
+    "type" : "fairy",
+    "food": ["chips","solt"]
+  },
+  {
+    "type" : "fighting",
+    "food": ["cheese","paper"]
+  },
+  {
+    "type" : "fire",
+    "food": ["water"]
+  },
+  {
+    "type" : "ghost",
+    "food": ["candy","fish"]
+  },
+  {
+    "type" : "grass",
+    "food": ["Berries", "sushi", "fish"]
+  },
+  {
+    "type" : "ground",
+    "food": ["grapes","bread"]
+  },
+  {
+    "type" : "ice",
+    "food": ["egg","lettuce"]
+  },
+  {
+    "type" : "normal",
+    "food": []
+  },
+  {
+    "type" : "poison",
+    "food": ["milk"]
+  },
+  {
+    "type" : "psychic",
+    "food": ["nuts"]
+  },
+  {
+    "type" : "rock",
+    "food": ["mashroom","milk"]
+  },
+  {
+    "type" : "water",
+    "food": ["life","milk"]
+  },
+  {
+    "type" : "flying",
+    "food": ["honey"]
+  },
+  {
+    "type" : "dark",
+    "food": ["nuts", "water"]
+  },
+  {
+    "type" : "steel",
+    "food": ["bread"]
+  }
+]
