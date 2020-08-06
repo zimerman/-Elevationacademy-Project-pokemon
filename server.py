@@ -82,7 +82,7 @@ def add_pokemon():
     except Exception as e:
         return json.dumps({"ERROR": str(e)}), 500
     try:
-        type_data.add_to_pokemontype(pokemon_to_add.get("id"), list_types)
+        type_data.add_to_pokemontype_list(pokemon_to_add.get("id"), list_types)
         return {"Status": "Succes, Added pokemon"}, 201
     except IntegrityError as error:
         code, message = error.args
@@ -165,4 +165,3 @@ def evolve():
 port_number = 3000
 if __name__ == '__main__':
     app.run(port=port_number)
-
