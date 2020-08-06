@@ -41,3 +41,12 @@ def add_to_pokemontype(id_, type):
     with connection.cursor() as cursor:
         cursor.execute(query2)
         connection.commit()
+
+
+def add_to_pokemontype_list(id_, types):
+    for type in types:
+        query2 = "INSERT into pokemontype values({}, '{}')".format(
+            id_, type)
+        with connection.cursor() as cursor:
+            cursor.execute(query2)
+            connection.commit()
